@@ -7,7 +7,7 @@ export function Signin ( props ) {
   const navigation = useNavigation()
   return(
     <View style={styles.container}>
-      <Text style={styles.font}>Sign up</Text>
+      <Text style={styles.font}>Log in</Text>
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
@@ -17,7 +17,7 @@ export function Signin ( props ) {
         <Text style={styles.font}>Password</Text>
         <TextInput style={styles.input} secureTextEntry={true}  />
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Sign up</Text>
+          <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
         <Text style={styles.font}>Don't have an account?</Text>
         <Button title="Sign up for an account" onPress={() => navigation.navigate("Signup")} />
@@ -37,7 +37,7 @@ const styles = StyleSheet.create( {
   },
   button: {
     marginVertical: 15,
-    backgroundColor: ThemeColours.cerise,
+    backgroundColor: ThemeColours.turquoise,
     padding: 10,
     borderRadius: 10,
   },

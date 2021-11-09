@@ -11,6 +11,7 @@ import { Home } from './components/Home';
 import { firebaseConfig } from './Config';
 import {initializeApp,} from 'firebase/app'
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
+import { ThemeColours } from './components/ThemeColours';
 
 initializeApp( firebaseConfig)
 
@@ -43,14 +44,25 @@ export default function App() {
             title: 'Sign up'
           }}
         /> */}
-        <Stack.Screen name="Signup" options={{title: 'Sign up'}}>
+        <Stack.Screen name="Signup" 
+          options={{
+            title: 'Sign up',
+            headerStyle: {
+              backgroundColor: ThemeColours.turquoise,
+            },
+            
+          }}>
           { (props) => <Signup {...props} handler={SignupHandler} auth={auth} /> }
         </Stack.Screen>
         <Stack.Screen 
           name="Signin" 
           component={Signin} 
           options={{
-            title:'Sign in'
+            title:'Log in',
+            headerStyle: {
+              backgroundColor: ThemeColours.blackcoral,
+            },
+            headerTintColor: ThemeColours.eggshell,
           }}
         />
         <Stack.Screen name="Home" component={Home} />

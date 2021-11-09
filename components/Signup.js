@@ -60,6 +60,8 @@ export function Signup(props) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
       <View style={styles.inner}>
+        <Text>Name</Text>
+        <TextInput style={styles.input} />
         <Text>Email</Text>
         <TextInput style={styles.input} onChangeText={ (val) => validateEmail(val) }/>
         <Text>Password</Text>
@@ -93,13 +95,13 @@ const styles = StyleSheet.create( {
   },
   button: {
     marginVertical: 15,
-    backgroundColor: ThemeColours.cerise,
+    backgroundColor: ThemeColours.shadowblue,
     padding: 10,
     borderRadius: 10,
   },
   buttonDisabled: {
     marginVertical: 15,
-    backgroundColor: ThemeColours.ceriseLight,
+    backgroundColor: ThemeColours.prussianblue,
     padding: 10,
     borderRadius: 10,
   },
