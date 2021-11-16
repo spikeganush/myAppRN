@@ -10,8 +10,10 @@ import { Home } from './components/Home';
 // firebase
 import { firebaseConfig } from './Config';
 import {initializeApp,} from 'firebase/app'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth"
 import { ThemeColours } from './components/ThemeColours';
+
+
 
 initializeApp( firebaseConfig)
 
@@ -21,8 +23,25 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const[ auth, setAuth ] = useState()
   const[ user, setUser ] = useState()
+  const[ signupError, setSignupError ] = useState()
+  const [signinError, setSigninError ] = useState()
+
+  const FBauth = getAuth()
+
+  useEffect(() => {
+    onAuthStateChanged( FBauth, (user) => {
+      if( user ){
+        setAuth(true)
+        setUser(user)
+      }else{
+        setAuth(false)
+        setUser(null)
+      }
+    })
+  })
 
   const SignupHandler = ( email, password ) => {
+    setSignupError("")
     const auth = getAuth()
     createUserWithEmailAndPassword( auth, email, password )
     .then( ( userCredential ) => { 
@@ -30,7 +49,16 @@ export default function App() {
       setUser(userCredential)
       setAuth( true )
     } )
-    .catch( (error) => { console.log(error) })
+    .catch( (error) => { setSignupError(error.message) })
+  }
+
+  const SigninHandler = ( email, password ) => {
+    signInWithEmailAndPassword( FBauth, email, password )
+    .then( (userCredential) => {
+      setUser(userCredential)
+      setAuth(true)
+    })
+    .catch( (error) => { setSigninError(error.code) })
   }
 
 
@@ -52,7 +80,7 @@ export default function App() {
             },
             
           }}>
-          { (props) => <Signup {...props} handler={SignupHandler} auth={auth} /> }
+          { (props) => <Signup {...props} handler={SignupHandler} auth={auth} error={signupError} /> }
         </Stack.Screen>
         <Stack.Screen 
           name="Signin" 
@@ -65,6 +93,7 @@ export default function App() {
             headerTintColor: ThemeColours.eggshell,
           }}
         />
+        { (props) => <Signin {...props} auth={auth} handler={SigninHandler} error={signinError} />}
         <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>

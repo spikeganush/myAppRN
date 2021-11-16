@@ -2,6 +2,7 @@ import React, {useState,useEffect} from 'react'
 import { View, Text, StyleSheet, Button, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { ThemeColours } from './ThemeColours';
+import { Feedback } from './Feedback';
 
 export function Signup(props) {
   const[validEmail, setValidEmail ] = useState( false )
@@ -77,6 +78,7 @@ export function Signup(props) {
         >
           <Text style={styles.buttonText}>Sign up</Text>
         </TouchableOpacity>
+        <Feedback message={props.error} error={true} />
         <Text>Already have an account?</Text>
         <Button title="Click here to sign in" onPress={() => navigation.navigate("Signin")} />
       </View>
@@ -95,13 +97,13 @@ const styles = StyleSheet.create( {
   },
   button: {
     marginVertical: 15,
-    backgroundColor: ThemeColours.shadowblue,
+    backgroundColor: ThemeColours.prussianblue,
     padding: 10,
     borderRadius: 10,
   },
   buttonDisabled: {
     marginVertical: 15,
-    backgroundColor: ThemeColours.prussianblue,
+    backgroundColor: ThemeColours.shadowblue,
     padding: 10,
     borderRadius: 10,
   },
