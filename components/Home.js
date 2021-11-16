@@ -1,11 +1,19 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-
+import React, {useEffect,useState} from 'react'
+import { View, Text, StyleSheet } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 export function Home ( props ) {
-    return (
-        <View>
-            <Text>Home</Text>
-        </View>
-    )
+  const navigation = useNavigation()
+
+  useEffect( () => {
+    if(!props.auth) {
+        navigation.reset({ index: 0, routes: [ {name: 'Signin'} ] })
+    }
+    }, [props.auth])
+
+  return(
+    <View>
+      <Text>Home</Text>
+    </View>
+  )
 }

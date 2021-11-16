@@ -7,13 +7,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Signup } from './components/Signup'
 import { Signin } from './components/Signin'
 import { Home } from './components/Home';
+import { Signout } from './components/Signout';
+
 // firebase
 import { firebaseConfig } from './Config';
 import {initializeApp,} from 'firebase/app'
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth"
 import { ThemeColours } from './components/ThemeColours';
-
-
 
 initializeApp( firebaseConfig)
 
@@ -61,6 +61,15 @@ export default function App() {
     .catch( (error) => { setSigninError(error.code) })
   }
 
+  const SignoutHandler = () => {
+    signOut( FBauth )
+    .then( () => {
+      setUser(null)
+      setAuth(false)
+    })
+    .catch( (error) => { console.log(error.code) })
+  }
+
 
   return (
     <NavigationContainer>
@@ -77,24 +86,36 @@ export default function App() {
             title: 'Sign up',
             headerStyle: {
               backgroundColor: ThemeColours.turquoise,
-            },
-            
+            }
           }}>
-          { (props) => <Signup {...props} handler={SignupHandler} auth={auth} error={signupError} /> }
+          { (props) => <Signup {...props} 
+            handler={SignupHandler} 
+            auth={auth} 
+            error={signupError} 
+          /> }
         </Stack.Screen>
         <Stack.Screen 
-          name="Signin" 
-          component={Signin} 
+          name="Signin"
           options={{
             title:'Log in',
             headerStyle: {
               backgroundColor: ThemeColours.blackcoral,
             },
             headerTintColor: ThemeColours.eggshell,
+            
           }}
-        />
+        >
         { (props) => <Signin {...props} auth={auth} handler={SigninHandler} error={signinError} />}
-        <Stack.Screen name="Home" component={Home} />
+        </Stack.Screen>
+        <Stack.Screen 
+          name="Home" 
+          options={{
+            headerTitle: "Home",
+            headerRight: (props) => <Signout {...props} handler={SignoutHandler} />
+          }} >
+          { (props) => <Home {...props} auth={auth}/>
+          }
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

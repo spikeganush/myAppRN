@@ -7,6 +7,8 @@ import { Feedback } from './Feedback';
 
 export function Signin ( props ) {
   const navigation = useNavigation()
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
 
   useEffect( () => {
     if( props.auth === true ) {
@@ -22,10 +24,15 @@ export function Signin ( props ) {
       >
       <View style={styles.inner}>
         <Text style={styles.font}>Email</Text>
-        <TextInput style={styles.input} />
+        <TextInput 
+            style={styles.input} 
+            onChangeText={ (val) => setEmail(val) } />
         <Text style={styles.font}>Password</Text>
-        <TextInput style={styles.input} secureTextEntry={true}  />
-        <TouchableOpacity style={styles.button}>
+        <TextInput style={styles.input} 
+            secureTextEntry={true} 
+            onChangeText={ (val) => setPassword(val) } />
+        <TouchableOpacity style={styles.button} 
+            onPress={ () => { props.handler(email, password) }}>
           <Text style={styles.buttonText}>Log in</Text>
         </TouchableOpacity>
         <Feedback message={props.error} error={true} />
