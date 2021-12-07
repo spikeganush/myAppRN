@@ -8,6 +8,9 @@ import { Signup } from './components/Signup'
 import { Signin } from './components/Signin'
 import { Home } from './components/Home';
 import { Signout } from './components/Signout';
+import { Splash } from './components/Splash';
+import { ClientDetails } from './components/ClientDetails'
+import { Greetings } from './components/Greetings'
 
 // firebase
 import { firebaseConfig } from './Config';
@@ -15,7 +18,22 @@ import {initializeApp,} from 'firebase/app'
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth"
 import { ThemeColours } from './components/ThemeColours';
 
-initializeApp( firebaseConfig)
+import { 
+  initializeFirestore, 
+  getFirestore, 
+  setDoc, 
+  doc, 
+  addDoc, 
+  getDoc,
+  collection,
+  query, 
+  where, 
+  onSnapshot 
+} from 'firebase/firestore'
+
+const FBapp = initializeApp( firebaseConfig)
+const FSdb = initializeFirestore(FBapp, {useFetchStreams: false})
+const FBauth = getAuth()
 
 
 const Stack = createNativeStackNavigator();
@@ -25,8 +43,9 @@ export default function App() {
   const[ user, setUser ] = useState()
   const[ signupError, setSignupError ] = useState()
   const [signinError, setSigninError ] = useState()
+  const [ data, setData ] = useState()
 
-  const FBauth = getAuth()
+  
 
   useEffect(() => {
     onAuthStateChanged( FBauth, (user) => {
@@ -58,7 +77,10 @@ export default function App() {
       setUser(userCredential)
       setAuth(true)
     })
-    .catch( (error) => { setSigninError(error.code) })
+    .catch( (error) => { 
+      const message = (error.code.includes('/') ) ? error.code.split('/')[1].replace(/-/g, ' ') : error.code
+      setSigninError(message) 
+    })
   }
 
   const SignoutHandler = () => {
@@ -69,11 +91,47 @@ export default function App() {
     })
     .catch( (error) => { console.log(error.code) })
   }
+  const addClientData = async ( FScollection , data ) => {
+    //adding data to a collection with automatic id
+    //const ref = await addDoc( collection(FSdb, FScollection ), data )
+    const ref = await setDoc( doc( FSdb, `users/${user.uid}/documents/${ new Date().getTime() }`), data )
+    //console.log( ref.id )
+  }
+  const getClientData = () => {
+    // console.log('...getting data', user)
+    const FSquery = query( collection( FSdb, `users/${user.uid}/documents`) )
+    const unsubscribe = onSnapshot( FSquery, ( querySnapshot ) => {
+      let FSdata = []
+      querySnapshot.forEach( (doc) => {
+        let item = {}
+        item = doc.data()
+        item.id = doc.id
+        FSdata.push( item )
+      })
+      setData( FSdata )
+    })
+  }
+  const getClientDetail = async ( id ) => {
+    const docRef = doc( FSdb, `users/${user.uid}/documents`, id )
+    const docData = await getDoc( docRef )
+    return new Promise( ( resolve, reject ) => {
+      if( docData.exists() ) {
+        let document = docData.data()
+        document.id = id
+        resolve( document )
+      }
+      else {
+        reject('no such document')
+      }
+    })
+    
+  }
+
 
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: true}}>
         {/* <Stack.Screen 
           name="Signup" 
           component={Signup} 
@@ -81,6 +139,14 @@ export default function App() {
             title: 'Sign up'
           }}
         /> */}
+        <Stack.Screen name="Splash">
+          { (props) => <Splash {...props} loadingText="Hello App" /> }
+        </Stack.Screen>
+        <Stack.Screen name="Greetings">
+          { (props) => <Greetings {...props} 
+            auth={auth} 
+          /> }
+        </Stack.Screen>
         <Stack.Screen name="Signup" 
           options={{
             title: 'Sign up',
@@ -113,8 +179,13 @@ export default function App() {
             headerTitle: "Home",
             headerRight: (props) => <Signout {...props} handler={SignoutHandler} />
           }} >
-          { (props) => <Home {...props} auth={auth}/>
+          { (props) => <Home {...props} auth={auth} signOutHandler={SignoutHandler} add={addClientData} data={ data } />
           }
+        </Stack.Screen>
+        <Stack.Screen name="Detail" options={{
+          headerTitle: "Item detail"
+        }}>
+          { (props) => <ClientDetails {...props} get={getClientDetail}  />  }
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
